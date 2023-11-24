@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +28,6 @@ public class ChatRoomService {
                 new EntityNotFoundException("Entity Not Found !"));
     }
 
-    @Transactional
     public AppResponse createChatRoom(ChatRoomRequest request, Long userId) {
 
         // prepare unique name for chat room
@@ -52,7 +52,9 @@ public class ChatRoomService {
                 .createdDate(new Date(System.currentTimeMillis()))
                 .isActive(true)
                 .participantList(new ArrayList<>(Arrays.asList(user)))
+                .chatRoomMessages(new HashSet<>())
                 .build();
+
 
         // update the concurrentMap
         availableChatRoomMap.put(modifiedChatRoomName, chatRoom);
@@ -60,10 +62,10 @@ public class ChatRoomService {
         return AppResponse.builder()
                 .responseCode("200")
                 .responseMessage("Chatroom created successfully. You can add other users now.")
+                .name(modifiedChatRoomName)
                 .build();
     }
 
-    @Transactional
     public AppResponse addUserInChatRoom(AddChatRoomUserRequest request) {
 
         // prepare unique name for chat room
@@ -89,7 +91,6 @@ public class ChatRoomService {
                 .build();
     }
 
-    @Transactional
     public AppResponse postMessageInChatRoom(PostChatMessageRequest request) {
 
         ChatRoomMessage message = null;
@@ -129,34 +130,70 @@ public class ChatRoomService {
         return AppResponse.builder()
                 .responseCode("200")
                 .responseMessage("Message posted successfully.")
+                .name(request.getChatRoomName())
                 .build();
     }
 
+    private UserResponse maptoUserResponse(User user) {
+        return UserResponse.builder()
+                .userId(user.getId())
+                .firstname(user.getFirstname())
+                .lastname(user.getLastname())
+                .email(user.getEmail())
+                .isEnabled(user.isEnabled())
+                .build();
+    }
     private ChatRoomMessage createChatRoomMessageDomainObject(String modifiedChatRoomName,
                                                               PostChatMessageRequest request, User user,
                                                               User toUser) {
         return ChatRoomMessage.builder()
                 .chatRoomName(modifiedChatRoomName)
                 .message(request.getMessage())
-                .createdBy(user)
-                .toUser(toUser)
+                .createdBy(maptoUserResponse(user))
+                .toUser(toUser == null ? null : maptoUserResponse(toUser))
                 .createdDate(new Date(System.currentTimeMillis()))
                 .isActive(true)
                 .build();
     }
 
-    @Transactional
-    public Set<ChatRoomMessage> getAllMessagesFromChatRoom(String chatRoomName) {
-        // prepare unique name for chat room
-        String modifiedChatRoomName = chatRoomName.trim()
-                .replaceAll(" ", "_").toUpperCase(Locale.ROOT);
+    public GetAllChatMessageResponse getAllMessagesFromChatRoom(String chatRoomName, Long userId) {
 
-        // check for unique name
-        if (!availableChatRoomMap.containsKey(modifiedChatRoomName)) {
-            return null;
+        Set<ChatRoomMessage> messageSet = null;
+
+        if(chatRoomName != null) {
+            // prepare unique name for chat room
+            String modifiedChatRoomName = chatRoomName.trim()
+                    .replaceAll(" ", "_").toUpperCase(Locale.ROOT);
+
+            // check for unique name
+            if (!availableChatRoomMap.containsKey(modifiedChatRoomName)) {
+                messageSet = null;
+            } else {
+                messageSet = availableChatRoomMap.get(modifiedChatRoomName).getChatRoomMessages();
+            }
         } else {
-            return availableChatRoomMap.get(modifiedChatRoomName).getChatRoomMessages();
+            messageSet = userWiseChatMessageMap.get(userId);
         }
+
+        return GetAllChatMessageResponse.builder()
+                .chatMessageSet(messageSet)
+                .chatRoomName(chatRoomName)
+                .build();
+    }
+
+    public GetAllUsersInChatRoomResponse getAllParticipantsFromChatRoom(String chatRoomName) {
+
+        List<UserResponse> userList = null;
+
+        if(chatRoomName != null && availableChatRoomMap.containsKey(chatRoomName)) {
+            userList = availableChatRoomMap.get(chatRoomName).getParticipantList().stream()
+                    .map(this::maptoUserResponse).collect(Collectors.toList());
+        }
+
+        return GetAllUsersInChatRoomResponse.builder()
+                .userResponseList(userList)
+                .chatRoomName(chatRoomName)
+                .build();
     }
 
     public Integer countAllEnabledUsers() {
