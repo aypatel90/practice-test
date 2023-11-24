@@ -12,6 +12,7 @@ import com.chatbot.exception.EntityNotFoundException;
 import com.chatbot.repository.ConfirmationTokenRepository;
 import com.chatbot.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,13 +35,20 @@ public class AuthenticationService {
 
     public AuthenticationResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new BusinessException("Já existe um usuário cadastrado com esse email!");
+            throw new BusinessException("User email is already been used. Please try with different email.");
+        }
+
+        User existingUser = userRepository.findUserByUserName(request.getUserName());
+
+        if(existingUser != null) {
+            throw new BusinessException("User Name is already been used. Please try with different username.");
         }
 
         User user = User.builder()
                 .firstname(request.getFirstname())
                 .lastname(request.getLastname())
                 .email(request.getEmail())
+                .userName(request.getUserName())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.ADMIN)
                 .build();
@@ -48,22 +56,6 @@ public class AuthenticationService {
         var token = jwtTokenService.generateToken(user);
         saveUserToken(savedUser, token);
 
-        /*Department department = Department.builder()
-                .name("Recursos Humanos")
-                .shortName("RH")
-                .employeeQuantity(0)
-                .user(user)
-                .build();
-        departmentRepository.save(department);*/
-
-       /* emailService.sendHtmlEmail(savedUser.getFirstname() + " " + savedUser.getLastname(),
-                savedUser.getEmail(), token);*/
-
-        /*return AppResponse.builder()
-                .responseCode("201")
-                .responseMessage("Usuário criado com Sucesso")
-                .name(savedUser.getFirstname() + " " + savedUser.getLastname())
-                .build();*/
         return AuthenticationResponse.builder()
                 .accessToken(token)
                 .refreshToken("refreshToken")
@@ -82,10 +74,6 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse authenticate(AuthenticateRequest authenticateRequest) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                authenticateRequest.getEmail(),
-                authenticateRequest.getPassword()
-        ));
         var user = userRepository.findByEmail(authenticateRequest
                 .getEmail()).orElseThrow();
         revokeAllUserTokens(user);
@@ -103,7 +91,11 @@ public class AuthenticationService {
     public void refreshToken(String token, HttpServletResponse response) throws IOException {
         final String userEmail;
 
-        userEmail = jwtTokenService.extractUserEmail(token);
+        try {
+            userEmail = jwtTokenService.extractUserEmail(token);
+        } catch (ExpiredJwtException exp) {
+            throw new BusinessException("Token is expired. Please do login again.");
+        }
         if (userEmail != null) {
             var user = this.userRepository.findByEmail(userEmail).orElseThrow();
             if (jwtTokenService.isTokenValid(token, user)) {

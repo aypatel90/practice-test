@@ -55,4 +55,17 @@ public class GeneralExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, response, new HttpHeaders(), status, request);
     }
 
+    @ExceptionHandler(BusinessException.class)
+    protected ResponseEntity<Object> handleBusinessException(BusinessException ex, WebRequest request) {
+
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+
+        ErrorResponse response = new ErrorResponse();
+        response.setStatus(status.value() + " ==> " + status.getReasonPhrase());
+        response.setTitle(ex.getMessage());
+        response.setTime(OffsetDateTime.now());
+
+        return handleExceptionInternal(ex, response, new HttpHeaders(), status, request);
+    }
+
 }

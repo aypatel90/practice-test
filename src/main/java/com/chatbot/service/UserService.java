@@ -21,7 +21,7 @@ public class UserService {
 
     public User getUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(() ->
-             new EntityNotFoundException("Usuário não foi encontrado"));
+             new EntityNotFoundException("Entity Not Found !"));
     }
 
     public AppResponse updateUser(RegisterRequest request, Long userId) {
@@ -29,6 +29,7 @@ public class UserService {
         user.setFirstname(request.getFirstname());
         user.setLastname(request.getLastname());
         user.setEmail(request.getEmail());
+        user.setUserName(request.getUserName());
         userRepository.save(user);
 
         return AppResponse.builder()
