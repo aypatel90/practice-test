@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -29,6 +30,9 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String lastname;
 
+    @Column(nullable = false)
+    private String userName;
+
     @Column(nullable = false, unique = true)
     private String email;
 
@@ -41,6 +45,15 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user")
     private List<ConfirmationToken> tokens;
+
+    @OneToMany(mappedBy = "chatroomUser")
+    Set<ChatroomUsers> chatroomUsersSet;
+
+//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "createdBy")
+//    private Set<Chatroom> chatroomList;
+
+    /*@OneToMany(cascade = CascadeType.ALL, mappedBy = "createdBy")
+    private Set<ChatMessage> chatMessagesList;*/
 
     public User(Long id) {
         this.id = id;

@@ -1,22 +1,23 @@
 package com.chatbot.domain;
 
-import com.chatbot.entity.User;
+import com.chatbot.entity.dto.UserResponse;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ThreadLocalRandom;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ChatRoomMessage {
 
     private String chatRoomName;
     private String message;
-    private User createdBy;
-    private User toUser;
+    private UserResponse createdBy;
+    private UserResponse toUser;
     private Date createdDate;
     private Date updatedDate;
     private boolean isActive;

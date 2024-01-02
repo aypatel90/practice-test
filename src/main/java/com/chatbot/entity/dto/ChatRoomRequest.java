@@ -1,19 +1,23 @@
 package com.chatbot.entity.dto;
 
-import com.chatbot.domain.ChatRoomMessage;
 import com.chatbot.entity.User;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.Date;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ChatRoomRequest {
 
+    @NotBlank
+    @Size(min = 3, max = 60)
     private String chatRoomName;
     private String chatRoomDescription;
     private User createdBy;

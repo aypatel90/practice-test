@@ -1,0 +1,313 @@
+{
+	"info": {
+		"_postman_id": "fa184fe2-be22-4433-bbca-90d27bc1f531",
+		"name": "Practice Collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbmtpdC5wYXRlbDEyQGFwZXhvbi5jb20iLCJpYXQiOjE2OTkyNjg2OTksImV4cCI6MTY5OTM1NTA5OX0.Ua4kn1R1CIkHP8rouq8NWfG6evnuVhcwVwOd3yVyOC0",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"ankit.patel12@apexon.com\",\r\n    \"password\": \"Test2\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/auth/authenticate",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"auth",
+						"authenticate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Chat Room",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbmtpdC5wYXRlbDE0QGFwZXhvbi5jb20iLCJpYXQiOjE3MDA4MDUyNjEsImV4cCI6MTcwMDg5MTY2MX0.gyx-jW8qAWbaglW-FKK2LT23w9u_S5UFNrq1ZgY9pL8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"chatRoomName\": \"Test 1\",\r\n    \"chatRoomDescription\": \"Test 1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/chat/chatroom/create",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"chat",
+						"chatroom",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add User In Chat Room",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbmtpdC5wYXRlbDE0QGFwZXhvbi5jb20iLCJpYXQiOjE3MDA4MDUyNjEsImV4cCI6MTcwMDg5MTY2MX0.gyx-jW8qAWbaglW-FKK2LT23w9u_S5UFNrq1ZgY9pL8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"chatRoomName\": \"TEST_1\",\r\n    \"userId\": \"5\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/chat/chatroom/user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"chat",
+						"chatroom",
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post Message In Chat Room",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbmtpdC5wYXRlbDE0QGFwZXhvbi5jb20iLCJpYXQiOjE3MDA4MDUyNjEsImV4cCI6MTcwMDg5MTY2MX0.gyx-jW8qAWbaglW-FKK2LT23w9u_S5UFNrq1ZgY9pL8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"chatRoomName\": \"TEST_1\",\r\n    \"message\": \"This is a sample test message.2\",\r\n    \"userId\" : \"5\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/chat/chatroom/post-message",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"chat",
+						"chatroom",
+						"post-message"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Messages from Chat Room",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbmtpdC5wYXRlbDE0QGFwZXhvbi5jb20iLCJpYXQiOjE3MDA4MDUyNjEsImV4cCI6MTcwMDg5MTY2MX0.gyx-jW8qAWbaglW-FKK2LT23w9u_S5UFNrq1ZgY9pL8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/chat/chatroom/all-message?chatroom-name=TEST_1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"chat",
+						"chatroom",
+						"all-message"
+					],
+					"query": [
+						{
+							"key": "chatroom-name",
+							"value": "TEST_1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Users from Chat Room",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbmtpdC5wYXRlbDE0QGFwZXhvbi5jb20iLCJpYXQiOjE3MDA4MDUyNjEsImV4cCI6MTcwMDg5MTY2MX0.gyx-jW8qAWbaglW-FKK2LT23w9u_S5UFNrq1ZgY9pL8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/chat/chatroom/user?chatroom-name=TEST_1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"chat",
+						"chatroom",
+						"user"
+					],
+					"query": [
+						{
+							"key": "chatroom-name",
+							"value": "TEST_1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Refresh Token",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/auth/refresh-token?token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbmtpdC5wYXRlbDEyQGFwZXhvbi5jb20iLCJpYXQiOjE2OTkyNjg2OTksImV4cCI6MTY5OTM1NTA5OX0.Ua4kn1R1CIkHP8rouq8NWfG6evnuVhcwVwOd3yVyOC0",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"auth",
+						"refresh-token"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbmtpdC5wYXRlbDEyQGFwZXhvbi5jb20iLCJpYXQiOjE2OTkyNjg2OTksImV4cCI6MTY5OTM1NTA5OX0.Ua4kn1R1CIkHP8rouq8NWfG6evnuVhcwVwOd3yVyOC0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register User",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstname\": \"Test3\",\r\n    \"lastname\": \"Test3\",\r\n    \"email\": \"ankit.patel14@apexon.com\",\r\n    \"userName\":\"aypatel91\",\r\n    \"password\": \"Test3\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/auth/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

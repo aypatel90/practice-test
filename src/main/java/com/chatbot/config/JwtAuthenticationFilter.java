@@ -1,8 +1,12 @@
 package com.chatbot.config;
 
 
+import com.chatbot.entity.User;
 import com.chatbot.repository.ConfirmationTokenRepository;
+import com.chatbot.repository.UserRepository;
 import com.chatbot.service.JwtTokenService;
+import io.jsonwebtoken.ExpiredJwtException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,6 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
 
     private final ConfirmationTokenRepository confirmationTokenRepository;
+    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -34,14 +39,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
-        final String userEmail;
+        String userEmail;
 
-        if (authHeader.isBlank() || !authHeader.startsWith("Bearer")) {
+        if (authHeader == null || authHeader.isBlank() || !authHeader.startsWith("Bearer")
+         || request.getRequestURI().contains("/api/v1/auth/authenticate")) {
             filterChain.doFilter(request,response);
             return;
         }
 
         jwt = authHeader.substring(7);
+
         userEmail = jwtTokenService.extractUserEmail(jwt);
 
         if(userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
