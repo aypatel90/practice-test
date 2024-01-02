@@ -15,8 +15,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.batch.item.Chunk;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -60,6 +61,40 @@ public class AuthenticationService {
                 .accessToken(token)
                 .refreshToken("refreshToken")
                 .user(maptoUserResponse(user))
+                .build();
+    }
+
+    public User processingRegistration(RegisterRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new BusinessException("User email is already been used. Please try with different email. " +request.getEmail());
+        }
+
+        User existingUser = userRepository.findUserByUserName(request.getUserName());
+
+        if(existingUser != null) {
+            throw new BusinessException("User Name is already been used. Please try with different username. "+request.getUserName());
+        }
+
+        return User.builder()
+                .firstname(request.getFirstname())
+                .lastname(request.getLastname())
+                .email(request.getEmail())
+                .userName(request.getUserName())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(Role.ADMIN)
+                .build();
+    }
+
+    public AuthenticationResponse writingRegistration(Chunk<? extends User> userList) {
+       for(User user : userList) {
+           var savedUser = userRepository.save(user);
+           var token = jwtTokenService.generateToken(savedUser);
+           saveUserToken(savedUser, token);
+       }
+
+        return AuthenticationResponse.builder()
+                .accessToken("")
+                .refreshToken("refreshToken")
                 .build();
     }
 

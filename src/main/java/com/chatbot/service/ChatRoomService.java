@@ -1,9 +1,13 @@
 package com.chatbot.service;
 
-import com.chatbot.domain.ChatRoom;
+//import com.chatbot.domain.ChatRoom;
 import com.chatbot.domain.ChatRoomMessage;
+import com.chatbot.entity.Chatroom;
+import com.chatbot.entity.ChatroomUsers;
 import com.chatbot.entity.User;
 import com.chatbot.entity.dto.*;
+import com.chatbot.repository.ChatroomRepository;
+import com.chatbot.repository.ChatroomUsersRepository;
 import com.chatbot.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +23,11 @@ import java.util.stream.Collectors;
 public class ChatRoomService {
 
     private final UserRepository userRepository;
-    private final ConcurrentHashMap<String, ChatRoom> availableChatRoomMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Chatroom> availableChatRoomMap = new ConcurrentHashMap<>();
 
+    private final ChatroomRepository chatroomRepository;
+
+    private final ChatroomUsersRepository chatroomUsersRepository;
     private final ConcurrentHashMap<Long, Set<ChatRoomMessage>> userWiseChatMessageMap = new ConcurrentHashMap<>();
 
     public User getUserById(Long userId) {
@@ -44,20 +51,33 @@ public class ChatRoomService {
 
         User user = getUserById(userId);
 
-        // Create chatroom domain object
-        ChatRoom chatRoom = ChatRoom.builder()
-                .chatRoomName(modifiedChatRoomName)
-                .chatRoomDescription(request.getChatRoomDescription())
+        ChatroomUsers chatroomUser = ChatroomUsers.builder()
+                //.chatroom(persistedChatroomEntity)
+                .chatroomUser(user)
                 .createdBy(user)
-                .createdDate(new Date(System.currentTimeMillis()))
                 .isActive(true)
-                .participantList(new ArrayList<>(Arrays.asList(user)))
-                .chatRoomMessages(new HashSet<>())
+                .build();
+
+        Set<ChatroomUsers> chatroomUsersSet = new HashSet<>();
+        chatroomUsersSet.add(chatroomUser);
+
+        Chatroom chatroom = Chatroom.builder()
+                .chatroomName(modifiedChatRoomName)
+                .chatroomDescription(request.getChatRoomDescription())
+                .createdBy(user)
+                .chatroomUsersSet(chatroomUsersSet)
+                .isActive(true)
                 .build();
 
 
+        Chatroom persistedChatroomEntity = chatroomRepository.save(chatroom);
+        chatroomUser.setChatroom(persistedChatroomEntity);
+        chatroomUsersRepository.save(chatroomUser);
+
+        //chatroomUsersRepository.save(chatroomUser);
+
         // update the concurrentMap
-        availableChatRoomMap.put(modifiedChatRoomName, chatRoom);
+        //availableChatRoomMap.put(modifiedChatRoomName, chatRoom);
 
         return AppResponse.builder()
                 .responseCode("200")
@@ -83,7 +103,7 @@ public class ChatRoomService {
         User user = getUserById(request.getUserId());
 
         // update the concurrentMap
-        availableChatRoomMap.get(modifiedChatRoomName).getParticipantList().add(user);
+        //availableChatRoomMap.get(modifiedChatRoomName).getParticipantList().add(user);
 
         return AppResponse.builder()
                 .responseCode("200")
@@ -114,7 +134,7 @@ public class ChatRoomService {
             message = createChatRoomMessageDomainObject(modifiedChatRoomName,request,user,null);
 
             // update the concurrentMap
-            availableChatRoomMap.get(modifiedChatRoomName).getChatRoomMessages().add(message);
+           // availableChatRoomMap.get(modifiedChatRoomName).getChatRoomMessages().add(message);
         } else {
             // one to one chat
             message = createChatRoomMessageDomainObject(null,request,user,getUserById(request.getToUserId()));
@@ -169,7 +189,7 @@ public class ChatRoomService {
             if (!availableChatRoomMap.containsKey(modifiedChatRoomName)) {
                 messageSet = null;
             } else {
-                messageSet = availableChatRoomMap.get(modifiedChatRoomName).getChatRoomMessages();
+                //messageSet = availableChatRoomMap.get(modifiedChatRoomName).getChatRoomMessages();
             }
         } else {
             messageSet = userWiseChatMessageMap.get(userId);
@@ -186,8 +206,8 @@ public class ChatRoomService {
         List<UserResponse> userList = null;
 
         if(chatRoomName != null && availableChatRoomMap.containsKey(chatRoomName)) {
-            userList = availableChatRoomMap.get(chatRoomName).getParticipantList().stream()
-                    .map(this::maptoUserResponse).collect(Collectors.toList());
+            //userList = availableChatRoomMap.get(chatRoomName).getParticipantList().stream()
+              //      .map(this::maptoUserResponse).collect(Collectors.toList());
         }
 
         return GetAllUsersInChatRoomResponse.builder()
